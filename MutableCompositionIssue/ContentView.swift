@@ -69,7 +69,7 @@ final class CompositionStore {
         let startPointOffset: CMTime = CMTime(value: 1, timescale: 30)
         var currentTime = CMTime.zero
 
-        for (index, targetTimeRange) in timeRanges.enumerated() {
+        for targetTimeRange in timeRanges {
             let sourceTimeRage = CMTimeRange(start: currentTime, duration: targetTimeRange.duration)
             print("source \(sourceTimeRage.debugString) | target \(targetTimeRange.debugString)")
             try await targetComposition.insertTimeRange(
