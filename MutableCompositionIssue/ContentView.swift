@@ -33,18 +33,18 @@ struct ContentView: View {
             .buttonStyle(BorderedButtonStyle())
         }
         .onAppear { generate(name: "IMG_4K") }
-        .onChange(of: compositionStore.asset) { _, newAsset in
-            let item = newAsset.map(AVPlayerItem.init)
-            item?.appliesPerFrameHDRDisplayMetadata = false
-            player.replaceCurrentItem(with: item)
-        }
     }
 
+    @MainActor
     private func generate(name: String) {
         generateTask?.cancel()
         generateTask = Task {
             compositionStore.asset = nil
             try! await compositionStore.build(name: name)
+            if Task.isCancelled { return }
+            let item = compositionStore.asset.map(AVPlayerItem.init)
+            item?.appliesPerFrameHDRDisplayMetadata = false
+            player.replaceCurrentItem(with: item)
             generateTask = nil
         }
     }
@@ -55,6 +55,7 @@ final class CompositionStore {
 
     var asset: AVMutableComposition?
 
+    @MainActor
     func build(name: String) async throws {
         let date = Date()
         print("Start")
