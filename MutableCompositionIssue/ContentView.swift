@@ -26,10 +26,13 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.yellow)
         .overlay(alignment: .bottom) {
-            Button("Generate", action: generate)
-                .buttonStyle(BorderedButtonStyle())
+            HStack {
+                Button("4K sources") { generate(name: "IMG_4K") }
+                Button("1080 sources") { generate(name: "IMG_1080") }
+            }
+            .buttonStyle(BorderedButtonStyle())
         }
-        .onAppear(perform: generate)
+        .onAppear { generate(name: "IMG_4K") }
         .onChange(of: compositionStore.asset) { _, newAsset in
             let item = newAsset.map(AVPlayerItem.init)
             item?.appliesPerFrameHDRDisplayMetadata = false
@@ -37,11 +40,11 @@ struct ContentView: View {
         }
     }
 
-    private func generate() {
+    private func generate(name: String) {
         generateTask?.cancel()
         generateTask = Task {
             compositionStore.asset = nil
-            try! await compositionStore.build()
+            try! await compositionStore.build(name: name)
             generateTask = nil
         }
     }
@@ -52,11 +55,11 @@ final class CompositionStore {
 
     var asset: AVMutableComposition?
 
-    func build() async throws {
+    func build(name: String) async throws {
         let date = Date()
         print("Start")
         defer { print("Complete: \(-date.timeIntervalSinceNow)") }
-        let bundleFileURL = Bundle.main.url(forResource: "IMG_HDR", withExtension: "MOV")!
+        let bundleFileURL = Bundle.main.url(forResource: name, withExtension: "MOV")!
         let sourceComposition = AVURLAsset(url: bundleFileURL)
 
         asset = nil
