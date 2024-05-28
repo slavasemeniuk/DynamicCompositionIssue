@@ -67,7 +67,7 @@ final class CompositionStore {
         let targetComposition = AVMutableComposition()
         let frameDurationValue: CMTimeValue = 5
         let frameDuration = CMTime(value: frameDurationValue, timescale: 30)
-        let timeRanges: [CMTimeRange] = (0 ... 10).map {
+        let timeRanges: [CMTimeRange] = (0 ... 25).map {
             CMTimeRange(start: CMTime(value: frameDurationValue * $0, timescale: 30), duration: frameDuration)
         }
         let startPointOffset: CMTime = CMTime(value: 1, timescale: 30)
